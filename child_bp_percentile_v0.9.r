@@ -21,7 +21,11 @@ bp_perc <- function (data, male="M", female="F", sbp="sbp", dbp="dbp", ht_perc="
   age <- round(data[,age],0)
   ht_perc <- data[,ht_perc]
   sbp <- data[,sbp]
-  dbp <- data[,dbp]
+  if (dbp %in% colnames(data)){
+    dbp <- data[,dbp]
+  }else{
+    dbp <- NA
+  }
   sex <- data[,sex]
   sbp_perc <- rep(NA, nrow(data))
   dbp_perc <- rep(NA, nrow(data))
@@ -210,30 +214,30 @@ names(fbpp) <- c("","","5th","10th","25th","50th","75th","90th","95th","5th","10
     }
 
 # Loop to calculate DBP percentiles
-
+  if (!is.na(dbp)){
   for(i in 1:nrow(data))
-    {
-    if(!is.na(ht_perc[i]) & !is.na(dbp[i]))
-      {# Females
-        if(sex[i]==female)
-          {
-          temp <- which(names(fbpp)[10:16]==ht_perc[i])
-          rown <- which(fbpp[,1]==age[i])
-          pick <-sum(dbp[i] >= as.numeric(fbpp[rown:(rown+3),9+temp]))
-          if(pick==0){dbp_perc[i] <- "<50th"}else{dbp_perc[i] <- fbpp[rown+pick-1,2]}
+      {
+        if(!is.na(ht_perc[i]) & !is.na(dbp[i]))
+          {# Females
+            if(sex[i]==female)
+              {
+              temp <- which(names(fbpp)[10:16]==ht_perc[i])
+              rown <- which(fbpp[,1]==age[i])
+              pick <-sum(dbp[i] >= as.numeric(fbpp[rown:(rown+3),9+temp]))
+              if(pick==0){dbp_perc[i] <- "<50th"}else{dbp_perc[i] <- fbpp[rown+pick-1,2]}
+              }
+            # Males
+            if(sex[i]==male)
+              {
+              temp <- which(names(mbpp)[10:16]==ht_perc[i])
+              rown <- which(mbpp[,1]==age[i])
+              pick <-sum(dbp[i] >= as.numeric(mbpp[rown:(rown+3),9+temp]))
+              if(pick==0){dbp_perc[i] <- "<50th"}else{dbp_perc[i] <- mbpp[rown+pick-1,2]}
+              }
           }
-        # Males
-        if(sex[i]==male)
-          {
-          temp <- which(names(mbpp)[10:16]==ht_perc[i])
-          rown <- which(mbpp[,1]==age[i])
-          pick <-sum(dbp[i] >= as.numeric(mbpp[rown:(rown+3),9+temp]))
-          if(pick==0){dbp_perc[i] <- "<50th"}else{dbp_perc[i] <- mbpp[rown+pick-1,2]}
-          }
-      }
+       }
     }
 
-          output <- cbind(sbp_perc,dbp_perc)
-         return(output)
-#         }
+    output <- cbind(sbp_perc,dbp_perc)
+    return(output)
   }
