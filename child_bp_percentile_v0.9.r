@@ -214,7 +214,7 @@ names(fbpp) <- c("","","5th","10th","25th","50th","75th","90th","95th","5th","10
     }
 
 # Loop to calculate DBP percentiles
-  if (!is.na(dbp)){
+  if (any(!is.na(dbp))){
   for(i in 1:nrow(data))
       {
         if(!is.na(ht_perc[i]) & !is.na(dbp[i]))
